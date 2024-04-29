@@ -58,7 +58,10 @@ for i, position in enumerate(steps):
 	prompt = start_prompt+" ".join(prompt)+end_prompt
 	if eval(prompt, secret):
 		score += 1
-		print(f'Test {i}/{tests}: Position {position}/{length}, Passed')
-	else: print(f'Test {i}/{tests}: Position {position}/{length}, Failed')
+		print(f'Test {i+1}/{tests}: Position {position}/{length}, Passed')
+	else:
+		print(f'Test {i+1}/{tests}: Position {position}/{length}, Failed')
+	if position<length:
+		print(f'Passed: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
 
 print(f'Passed: {score}/{tests}, {score/tests*100.0:.2f}%')
