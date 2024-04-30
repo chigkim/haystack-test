@@ -54,7 +54,7 @@ for i, position in enumerate(steps):
 	if position<length:
 		prompt = prompt[:position] + [hide] + prompt[position:]
 	else:
-		print("Running the last test with no secret inserted. It should fail, and it doesn't count toward the final score.")
+		print("Running the last bonus test with no secret inserted. It should fail, and it doesn't count toward the final score.")
 	prompt = start_prompt+" ".join(prompt)+end_prompt
 	if eval(prompt, secret):
 		score += 1
