@@ -6,8 +6,7 @@ model = "llama3:8b-instruct-q8_0"
 file = "text.txt"
 # Number of tests to run
 tests = 10
-# Generation parameters for Ollama
-# It decreases num_ctx by -1 every test in order to trigger reload the model and refresh.
+# Generation parameters for Ollama. Change the num_ctx according to the model.
 options={'temperature':0.0, 'num_ctx':8192, 'num_predict':-1}
 system = 'You are a helpful assistant.'
 start_prompt = 'Somewhere in the text below, there is a secret phrase I need to locate.\n---Text begins, start searching!\n'
@@ -20,7 +19,6 @@ import random
 def eval(prompt, secret):
 	messages = [{'role': 'system', 'content': system}]
 	messages.append({'role': 'user', 'content': prompt})
-	options['num_ctx'] -= 1
 	response = client.chat(model=model, messages=messages, options=options)
 	div = 1000000000
 	total = response['total_duration']/div
@@ -49,18 +47,19 @@ print("Testing "+model)
 for i, position in enumerate(steps):
 	secret = random.choice(secrets)
 	hide = f'\nThe secret phrase is: "{secret}"\n'
-	if position==length:
-		prompt = list(words)
-		print("Running the last test with no secret inserted. It should fail, and it doesn't count toward the final score.")
+	prompt = list(words)
+	random.shuffle(prompt)
+	if position<length:
+		prompt = prompt[:position] + [hide] + prompt[position:]
 	else:
-		prompt = words[:position] + [hide] + words[position:]
+		print("Running the last test with no secret inserted. It should fail, and it doesn't count toward the final score.")
 	prompt = start_prompt+" ".join(prompt)+end_prompt
 	if eval(prompt, secret):
 		score += 1
-		print(f'Test {i+1}/{tests}: Position {position}/{length}, Passed')
+		print(f'Passed test {i+1}/{tests}, Position {position}/{length}')
 	else:
-		print(f'Test {i+1}/{tests}: Position {position}/{length}, Failed')
+		print(f'Failed test {i+1}/{tests}, Position {position}/{length}')
 	if position<length:
-		print(f'Passed: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
+		print(f'Score: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
 
-print(f'Passed: {score}/{tests}, {score/tests*100.0:.2f}%')
+print(f'Score: {score}/{tests}, {score/tests*100.0:.2f}%')
