@@ -2,12 +2,12 @@ from time import time
 start = time()
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--model", help="Model", default="llama3")
-parser.add_argument("--host", help="Ollama Host Address", default='http://localhost:11434')
-parser.add_argument("-f", "--file", help="Text file", default="text.txt")
-parser.add_argument("-s", "--secret", help="Text file", default="secrets.txt")
-parser.add_argument("-c", "--context", help="Max Context Size", type=int, default=8192)
-parser.add_argument("-t", "--tests", help="Number of Test", type=int, default=100)
+parser.add_argument("-m", "--model", help="Model name, default=llama3", default="llama3")
+parser.add_argument("--host", help="Ollama Host Address, default=localhost:11434", default='http://localhost:11434')
+parser.add_argument("-f", "--file", help="Text file for context, default=text.txt", default="text.txt")
+parser.add_argument("-s", "--secret", help="Text file for secrets, default=secrets.txt", default="secrets.txt")
+parser.add_argument("-c", "--context", help="Max Context Size, default=8192", type=int, default=8192)
+parser.add_argument("-t", "--tests", help="Number of Tests, default=100", type=int, default=100)
 args = parser.parse_args()
 
 options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':-1}
