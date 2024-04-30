@@ -31,10 +31,8 @@ def eval(prompt, secret):
 	gen_duration = response['eval_duration']/div
 	stat = f"Total: {total:.2f} secs, Load: {load:.2f} secs, Prompt Processing: {prompt_count} tokens, {prompt_count/prompt_duration:.2f} tk/s, Text Generation: {gen_count} tokens, {gen_count/gen_duration:.2f} tk/s"
 	print(stat)
-	print(response['message']['content'])
-	if secret in response['message']['content']:
-		return True
-	else: return False
+	print(response['message']['content'].strip())
+	return secret in response['message']['content']
 
 secrets = codecs.open('secrets.txt', 'r', 'utf-8').readlines()
 secrets = [phrase.strip() for phrase in secrets]
@@ -45,6 +43,7 @@ score = 0
 length = len(words)
 step = int(length/tests)
 steps = list(range(0, length, step))
+steps = steps[:tests]
 steps.append(length)
 print("Testing "+model)
 for i, position in enumerate(steps):
