@@ -37,3 +37,16 @@ options:
 * Join the `words` list into a single document along with a predefined prompt and feed it to the model.
 
 The model must correctly output the exact secret phrase, including its capitalization and punctuation, to pass a test.
+
+## Prompt
+
+```
+System: You are a helpful assistant.
+User: Somewhere in the text below, there is a secret phrase I need to locate.
+---Text begins, start searching!
+...text...
+The secret phrase is: "The little red hen laid the golden eggs"
+...text...
+---Text ends, stop searching!
+What is the secret phrase?
+```

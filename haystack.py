@@ -65,5 +65,5 @@ for i, position in enumerate(steps):
 	if position<length:
 		print(f'Score: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
 
-print(f'Score: {score}/{args.tests}, {score/args.tests*100.0:.2f}%')
+print(f'Final Score: {score}/{args.tests}, {score/args.tests*100.0:.2f}%')
 print(f"Finished in {time()-start:.2f} seconds.")
