@@ -5,13 +5,15 @@ model = "llama3:8b-instruct-q8_0"
 # File name to read text to use for hiding secrets
 file = "text.txt"
 # Number of tests to run
-tests = 10
+tests = 100
 # Generation parameters for Ollama. Change the num_ctx according to the model.
 options={'temperature':0.0, 'num_ctx':8192, 'num_predict':-1}
 system = 'You are a helpful assistant.'
 start_prompt = 'Somewhere in the text below, there is a secret phrase I need to locate.\n---Text begins, start searching!\n'
 end_prompt = '\n---Text ends, stop searching!\nWhat is the secret phrase?'
 
+from time import time
+start = time()
 from ollama import Client
 import codecs
 import random
@@ -63,3 +65,4 @@ for i, position in enumerate(steps):
 		print(f'Score: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
 
 print(f'Score: {score}/{tests}, {score/tests*100.0:.2f}%')
+print(f"Finished in {time()-start:.2f} seconds.")
