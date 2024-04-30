@@ -29,12 +29,14 @@ options:
 
 ## Process
 
+This is what the script does when you run the test.
+
 * Read `secrets.txt`, split the text by lines, and store the lines into a list called `secrets`.
 * Read `text.txt`, split the text by words, and store the words into a list called `words`.
 * Before each test, shuffle the `words` list.
 * Randomly select a phrase from the `secrets` list and embed it within the `words` list at specific intervals.
 * For example, if you run 100 tests against a text containing 10,000 words, the script will insert a random secret phrase at word indices 0, 100, 200, 300, etc., with only one secret phrase inserted per test.
-* Join the `words` list into a single document along with a predefined prompt and feed it to the model.
+* Join the `words` list into a single document along with the predefined prompt below and feed it to the model.
 
 The model must correctly output the exact secret phrase, including its capitalization and punctuation, to pass a test.
 
@@ -50,3 +52,15 @@ The secret phrase is: "The little red hen laid the golden eggs"
 ---Text ends, stop searching!
 What is the secret phrase?
 ```
+
+## Result
+
+Here are the results after running 100 tests for each model below:
+
+| Model | Input Context Length | Score |
+| --- | --- | --- |
+| llama3-gradient:8b-instruct-1048k-q8_0 | 32K | 100% |
+| llama3:8b-instruct-q8_0 | 8K | 94% |
+| dolphin-llama3:8b-256k-v2.9-q8_0 | 8K | 75% |
+
+Here's the [log](https://gist.github.com/chigkim/e047b83755df46548f69454973f1b81f) for the full output.
