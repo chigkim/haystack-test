@@ -1,19 +1,20 @@
-# Host address where Ollama is listening
-host='http://localhost:11434'
-# model name to test
-model = "llama3:8b-instruct-q8_0"
-# File name to read text to use for hiding secrets
-file = "text.txt"
-# Number of tests to run
-tests = 100
-# Generation parameters for Ollama. Change the num_ctx according to the model.
-options={'temperature':0.0, 'num_ctx':8192, 'num_predict':-1}
+from time import time
+start = time()
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-m", "--model", help="Model", default="llama3")
+parser.add_argument("--host", help="Ollama Host Address", default='http://localhost:11434')
+parser.add_argument("-f", "--file", help="Text file", default="text.txt")
+parser.add_argument("-s", "--secret", help="Text file", default="secrets.txt")
+parser.add_argument("-c", "--context", help="Max Context Size", type=int, default=8192)
+parser.add_argument("-t", "--tests", help="Number of Test", type=int, default=100)
+args = parser.parse_args()
+
+options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':-1}
 system = 'You are a helpful assistant.'
 start_prompt = 'Somewhere in the text below, there is a secret phrase I need to locate.\n---Text begins, start searching!\n'
 end_prompt = '\n---Text ends, stop searching!\nWhat is the secret phrase?'
 
-from time import time
-start = time()
 from ollama import Client
 import codecs
 import random
@@ -21,7 +22,7 @@ import random
 def eval(prompt, secret):
 	messages = [{'role': 'system', 'content': system}]
 	messages.append({'role': 'user', 'content': prompt})
-	response = client.chat(model=model, messages=messages, options=options)
+	response = client.chat(model=args.model, messages=messages, options=options)
 	div = 1000000000
 	total = response['total_duration']/div
 	load = response['load_duration']/div
@@ -34,18 +35,18 @@ def eval(prompt, secret):
 	print(response['message']['content'].strip())
 	return secret in response['message']['content']
 
-secrets = codecs.open('secrets.txt', 'r', 'utf-8').readlines()
+secrets = codecs.open(args.secret, 'r', 'utf-8').readlines()
 secrets = [phrase.strip() for phrase in secrets]
-client = Client(host=host)
-text = codecs.open(file, 'r', 'utf-8').read()
+client = Client(host=args.host)
+text = codecs.open(args.file, 'r', 'utf-8').read()
 words = text.split(" ")
 score = 0
 length = len(words)
-step = int(length/tests)
+step = int(length/args.tests)
 steps = list(range(0, length, step))
-steps = steps[:tests]
+steps = steps[:args.tests]
 steps.append(length)
-print("Testing "+model)
+print("Testing "+args.model)
 for i, position in enumerate(steps):
 	secret = random.choice(secrets)
 	hide = f'\nThe secret phrase is: "{secret}"\n'
@@ -58,11 +59,11 @@ for i, position in enumerate(steps):
 	prompt = start_prompt+" ".join(prompt)+end_prompt
 	if eval(prompt, secret):
 		score += 1
-		print(f'Passed test {i+1}/{tests}, Position {position}/{length}')
+		print(f'Passed test {i+1}/{args.tests}, Position {position}/{length}')
 	else:
-		print(f'Failed test {i+1}/{tests}, Position {position}/{length}')
+		print(f'Failed test {i+1}/{args.tests}, Position {position}/{length}')
 	if position<length:
 		print(f'Score: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
 
-print(f'Score: {score}/{tests}, {score/tests*100.0:.2f}%')
+print(f'Score: {score}/{args.tests}, {score/args.tests*100.0:.2f}%')
 print(f"Finished in {time()-start:.2f} seconds.")
