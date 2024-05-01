@@ -8,12 +8,13 @@ parser.add_argument("-f", "--file", help="Text file for context, default=text.tx
 parser.add_argument("-s", "--secret", help="Text file for secrets, default=secrets.txt", default="secrets.txt")
 parser.add_argument("-c", "--context", help="Max Context Size, default=8192", type=int, default=8192)
 parser.add_argument("-t", "--tests", help="Number of Tests, default=100", type=int, default=100)
+parser.add_argument("-n", "--needles", help="Number of needles, default=3", type=int, default=3)
 args = parser.parse_args()
 
 options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':-1}
 system = 'You are a helpful assistant.'
-start_prompt = 'Somewhere in the text below, there is a secret phrase I need to locate.\n---Text begins, start searching!\n'
-end_prompt = '\n---Text ends, stop searching!\nWhat is the secret phrase?'
+start_prompt = 'Identify and assemble the secret sentence from the numbered fragments hidden in the text below.\n---Text begins here, start your search now!\n'
+end_prompt = '\n---Text ends here, stop your search.\nPlease arrange the secret fragments you located in numerical order to construct the full secret sentence. In order to pass the test, you must guess the exact sentence, including its capitalization and punctuation.\nWhat is the complete secret sentence?'
 
 from ollama import Client
 import codecs
@@ -35,6 +36,27 @@ def eval(prompt, secret):
 	print(response['message']['content'].strip())
 	return secret in response['message']['content']
 
+def fragment(secret, n):
+	print("Secret:", secret)
+	secrets = secret.split(" ")
+	length = len(secrets)
+	if n>length:
+		n = length
+	fragments = []
+	step = int(length/n)
+	steps = range(0,length, step)
+	steps = steps[:n]
+	for i, pos in enumerate(steps):
+		fragment = ""
+		if i+1 == n:
+			fragment = " ".join(secrets[pos:])
+		else:
+			fragment = " ".join(secrets[pos:pos+step])
+		fragment = f'\nSecret fragment {i+1}: "{fragment}"\n'
+		fragments.append(fragment)
+	random.shuffle(fragments)
+	return fragments
+
 secrets = codecs.open(args.secret, 'r', 'utf-8').readlines()
 secrets = [phrase.strip() for phrase in secrets]
 client = Client(host=args.host)
@@ -48,20 +70,20 @@ steps = steps[:args.tests]
 steps.append(length)
 print("Testing "+args.model)
 for i, position in enumerate(steps):
-	secret = random.choice(secrets)
-	hide = f'\nThe secret phrase is: "{secret}"\n'
 	prompt = list(words)
-	random.shuffle(prompt)
 	if position<length:
-		prompt = prompt[:position] + [hide] + prompt[position:]
+		secret = random.choice(secrets)
+		hide = fragment(secret, args.needles)
+		prompt = prompt[:position] + hide + prompt[position:]
+		random.shuffle(prompt)
 	else:
 		print("Running the last bonus test with no secret inserted. It should fail, and it doesn't count toward the final score.")
 	prompt = start_prompt+" ".join(prompt)+end_prompt
 	if eval(prompt, secret):
 		score += 1
-		print(f'Passed test {i+1}/{args.tests}, Position {position}/{length}')
+		print(f'Passed test {i+1}/{args.tests}')
 	else:
-		print(f'Failed test {i+1}/{args.tests}, Position {position}/{length}')
+		print(f'Failed test {i+1}/{args.tests}')
 	if position<length:
 		print(f'Score: {score}/{i+1}, {score/(i+1)*100.0:.2f}%')
 

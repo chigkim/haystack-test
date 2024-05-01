@@ -6,12 +6,12 @@ Fun, Pseudo needle in a haystack test for Ollama.
 
 * Make sure you have Ollama installed, and downloaded a model to test.
 * Install ollama python library: pip install ollama
-* Run python haystack.py
+* Run python haystack-single.py
 
 ```bash
-python haystack.py -h
+python haystack-single.py -h
 
-usage: haystack.py [-h] [-m MODEL] [--host HOST] [-f FILE] [-s SECRET] [-c CONTEXT] [-t TESTS]
+usage: haystack-single.py [-h] [-m MODEL] [--host HOST] [-f FILE] [-s SECRET] [-c CONTEXT] [-t TESTS]
 
 options:
   -h, --help            show this help message and exit
