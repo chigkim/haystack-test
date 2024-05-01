@@ -19,6 +19,7 @@ end_prompt = '\n---Text ends here, stop your search.\nPlease arrange the secret 
 from ollama import Client
 import codecs
 import random
+import re
 
 def eval(prompt, secret):
 	messages = [{'role': 'system', 'content': system}]
@@ -37,6 +38,7 @@ def eval(prompt, secret):
 	return secret in response['message']['content']
 
 def fragment(secret, n):
+	# Split the phrase into n fragments.
 	print("Secret:", secret)
 	secrets = secret.split(" ")
 	length = len(secrets)
@@ -54,8 +56,20 @@ def fragment(secret, n):
 			fragment = " ".join(secrets[pos:pos+step])
 		fragment = f'\nSecret fragment {i+1}: "{fragment}"\n'
 		fragments.append(fragment)
-	random.shuffle(fragments)
 	return fragments
+
+def shuffle(prompt, secret):
+	# Make sure the fragments never appear in order.
+	r = r'Secret fragment \d+: \"(.*?)\"'
+	while True:
+		random.shuffle(prompt)
+		fragments = [re.search(r, f)[1] for f in prompt if re.search(r, f)]
+		if " ".join(fragments) != secret: break
+
+	positions = [f"{w.strip()[16:]} at {p}" for p, w in enumerate(prompt) if "Secret fragment " in w]
+	positions = ", ".join(positions)
+	print("Inserted", positions)
+	return prompt
 
 secrets = codecs.open(args.secret, 'r', 'utf-8').readlines()
 secrets = [phrase.strip() for phrase in secrets]
@@ -75,7 +89,7 @@ for i, position in enumerate(steps):
 		secret = random.choice(secrets)
 		hide = fragment(secret, args.needles)
 		prompt = prompt[:position] + hide + prompt[position:]
-		random.shuffle(prompt)
+		prompt = shuffle(prompt, secret)
 	else:
 		print("Running the last bonus test with no secret inserted. It should fail, and it doesn't count toward the final score.")
 	prompt = start_prompt+" ".join(prompt)+end_prompt
