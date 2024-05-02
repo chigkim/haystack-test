@@ -7,10 +7,11 @@ parser.add_argument("--host", help="Ollama Host Address, default=localhost:11434
 parser.add_argument("-f", "--file", help="Text file for context, default=text.txt", default="text.txt")
 parser.add_argument("-s", "--secret", help="Text file for secrets, default=secrets.txt", default="secrets.txt")
 parser.add_argument("-c", "--context", help="Max Context Size, default=8192", type=int, default=8192)
+parser.add_argument("-p", "--predict", help="Max number of tokens to predict, default=300", type=int, default=300)
 parser.add_argument("-t", "--tests", help="Number of Tests, default=100", type=int, default=100)
 args = parser.parse_args()
 
-options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':-1}
+options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':args.predict}
 system = 'You are a helpful assistant.'
 start_prompt = 'Somewhere in the text below, there is a secret phrase I need to locate.\n---Text begins, start searching!\n'
 end_prompt = '\n---Text ends, stop searching!\nWhat is the secret phrase?'
