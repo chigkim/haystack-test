@@ -1,4 +1,4 @@
-from time import time
+﻿from time import time
 start = time()
 import argparse
 parser = argparse.ArgumentParser()

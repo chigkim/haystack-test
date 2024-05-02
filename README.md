@@ -1,4 +1,4 @@
-# haystack-test
+﻿# haystack-test
 
 Fun, Pseudo needle in a haystack test for Ollama.
 
@@ -40,7 +40,7 @@ This is what the script does when you run the test.
 
 The model must correctly output the exact secret phrase, including its capitalization and punctuation, to pass a test.
 
-## Prompt
+## Prompt for Single Needle
 
 ```
 System: You are a helpful assistant.
@@ -53,14 +53,31 @@ The secret phrase is: "The little red hen laid the golden eggs"
 What is the secret phrase?
 ```
 
+## Prompt for Multie Needle
+
+```
+Identify and assemble the secret sentence from the numbered fragments hidden in the text below.
+---Text begins here, start your search now!
+...text...
+Secret fragment 3: "on my shoulder."
+...text...
+Secret fragment 1: "The soft, fluffy"
+...text...
+Secret fragment 2: "kitten purred loudly"
+...text...
+---Text ends here, stop your search.
+Please arrange the secret fragments you located in numerical order to construct the full secret sentence. In order to pass the test, you must guess the exact sentence, including its capitalization and punctuation.
+What is the complete secret sentence?
+```
+
 ## Result
 
 Here are the results after running 100 tests for each model below:
 
-| Model | Input Context Length | Score |
-| --- | --- | --- |
-| llama3-gradient:8b-instruct-1048k-q8_0 | 32K | 100% |
-| llama3:8b-instruct-q8_0 | 8K | 94% |
-| dolphin-llama3:8b-256k-v2.9-q8_0 | 8K | 75% |
+| Model | Input Context Length | Single Needle | Multi Needle |
+| --- | --- | --- | --- |
+| llama3:8b-instruct-q8_0 | 8K | 94% | 44% |
+| llama3-gradient:8b-instruct-1048k-q8_0 | 32K | 100% | 33% |
+| dolphin-llama3:8b-256k-v2.9-q8_0 | 8K | 75% | 2% |
 
 Here's the [log](https://gist.github.com/chigkim/e047b83755df46548f69454973f1b81f) for the full output.
