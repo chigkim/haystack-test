@@ -82,6 +82,7 @@ Here are the results after running 100 tests for each model below:
 | Model | Input Context Length | Single Needle | Multi Needle |
 | --- | --- | --- | --- |
 | llama3:8b-instruct-q8_0 | 8K | 94% | 44% |
+| llama3:70b-instruct-q8_0 | 8K | No Test | 100% |
 | llama3-gradient:8b-instruct-1048k-q8_0 | 32K | 100% | 33% |
 | dolphin-llama3:8b-256k-v2.9-q8_0 | 8K | 75% | 2% |
 
