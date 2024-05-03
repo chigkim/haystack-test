@@ -12,7 +12,7 @@ parser.add_argument("-t", "--tests", help="Number of Tests, default=100", type=i
 parser.add_argument("-n", "--needles", help="Number of needles, default=3", type=int, default=3)
 args = parser.parse_args()
 
-options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':args.predict}
+options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':args.predict, 'use_mlock': True}
 system = 'You are a helpful assistant.'
 start_prompt = 'Identify and assemble the secret sentence from the numbered fragments hidden in the text below.\n---Text begins here, start your search now!\n'
 end_prompt = '\n---Text ends here, stop your search.\nPlease arrange the secret fragments you located in numerical order to construct the full secret sentence. In order to pass the test, you must use the exact words, capitalization, punctuation, and sequence from the fragments.\nWhat is the complete secret sentence?'
@@ -32,7 +32,7 @@ def report_stats(response):
 		gen_count = response['eval_count']
 		gen_duration = response['eval_duration']/div
 		stats = f"Total: {total:.2f} secs, Load: {load:.2f} secs, Prompt Processing: {prompt_count} tokens, {prompt_count/prompt_duration:.2f} tk/s, Text Generation: {gen_count} tokens, {gen_count/gen_duration:.2f} tk/s"
-		print("Stats:", stats)
+		print(stats)
 	except:
 		print("Stats: Unknown")
 

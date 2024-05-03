@@ -11,7 +11,7 @@ parser.add_argument("-p", "--predict", help="Max number of tokens to predict, de
 parser.add_argument("-t", "--tests", help="Number of Tests, default=100", type=int, default=100)
 args = parser.parse_args()
 
-options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':args.predict}
+options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':args.predict, 'use_mlock': True}
 system = 'You are a helpful assistant.'
 start_prompt = 'Somewhere in the text below, there is a secret phrase I need to locate.\n---Text begins, start searching!\n'
 end_prompt = '\n---Text ends, stop searching!\nWhat is the secret phrase?'
