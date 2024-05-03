@@ -4,9 +4,14 @@ Fun, Pseudo needle in a haystack test for Ollama.
 
 ## Instruction
 
-* Make sure you have Ollama installed, and downloaded a model to test.
-* Install ollama python library: pip install ollama
-* Run python haystack-single.py
+After installing [Ollama](https://ollama.com/download) and [downloading a model](https://ollama.com/library) to test, you can execute the following commands to install Ollama python and run 100 tests for 8192 context size.
+
+```bash
+pip install ollama
+python3 haystack-multi.py -m llama3 -f text.txt -s secrets.txt -c 8192 -t 100
+```
+
+Make sure to leave about 500 tokens as a buffer in order to fit the prompt, secrets, and response from model. For example, if your context size is 8192, your text should be 7692 tokens or less.
 
 ```bash
 python haystack-single.py -h

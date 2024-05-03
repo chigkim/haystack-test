@@ -15,28 +15,35 @@ args = parser.parse_args()
 options={'temperature':0.0, 'num_ctx':args.context, 'num_predict':args.predict}
 system = 'You are a helpful assistant.'
 start_prompt = 'Identify and assemble the secret sentence from the numbered fragments hidden in the text below.\n---Text begins here, start your search now!\n'
-end_prompt = '\n---Text ends here, stop your search.\nPlease arrange the secret fragments you located in numerical order to construct the full secret sentence. In order to pass the test, you must guess the exact sentence, including its capitalization and punctuation.\nWhat is the complete secret sentence?'
+end_prompt = '\n---Text ends here, stop your search.\nPlease arrange the secret fragments you located in numerical order to construct the full secret sentence. In order to pass the test, you must use the exact words, capitalization, punctuation, and sequence from the fragments.\nWhat is the complete secret sentence?'
 
 from ollama import Client
 import codecs
 import random
 import re
 
+def report_stats(response):
+	try:
+		div = 1000000000
+		total = response['total_duration']/div
+		load = response['load_duration']/div
+		prompt_count = response['prompt_eval_count'] if 'prompt_eval_count' in response else 0
+		prompt_duration = response['prompt_eval_duration']/div
+		gen_count = response['eval_count']
+		gen_duration = response['eval_duration']/div
+		stats = f"Total: {total:.2f} secs, Load: {load:.2f} secs, Prompt Processing: {prompt_count} tokens, {prompt_count/prompt_duration:.2f} tk/s, Text Generation: {gen_count} tokens, {gen_count/gen_duration:.2f} tk/s"
+		print("Stats:", stats)
+	except:
+		print("Stats: Unknown")
+
 def eval(prompt, secret):
 	messages = [{'role': 'system', 'content': system}]
 	messages.append({'role': 'user', 'content': prompt})
 	response = client.chat(model=args.model, messages=messages, options=options)
-	div = 1000000000
-	total = response['total_duration']/div
-	load = response['load_duration']/div
-	prompt_count = response['prompt_eval_count'] if 'prompt_eval_count' in response else 0
-	prompt_duration = response['prompt_eval_duration']/div
-	gen_count = response['eval_count']
-	gen_duration = response['eval_duration']/div
-	stat = f"Total: {total:.2f} secs, Load: {load:.2f} secs, Prompt Processing: {prompt_count} tokens, {prompt_count/prompt_duration:.2f} tk/s, Text Generation: {gen_count} tokens, {gen_count/gen_duration:.2f} tk/s"
-	print(stat)
-	print(response['message']['content'].strip())
-	return secret in response['message']['content']
+	report_stats(response)
+	message = response['message']['content'].strip()
+	print("Response:", message)
+	return secret in message
 
 def fragment(secret, n):
 	# Split the phrase into n fragments.
